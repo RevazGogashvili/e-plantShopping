@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import './ProductList.css'
-import CartItem from './CartItem';
+import CartItem from './CartItem'; // Assuming CartItem.jsx exists
+
+// 1. Import useDispatch from react-redux
+import { useDispatch } from 'react-redux';
+// 2. Import addItem action creator from CartSlice
+import { addItem } from './CartSlice'; // Assuming CartSlice.js is in the same directory
+
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
-    const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
+    // 3. Initialize addedToCart state (as per your step)
+    const [addedToCart, setAddedToCart] = useState({});
+
+    // 4. Initialize dispatch
+    const dispatch = useDispatch();
 
     const plantsArray = [
+        // ... (plantsArray content remains the same as your provided code)
         {
             category: "Air Purifying Plants",
             plants: [
@@ -116,9 +127,9 @@ function ProductList({ onHomeClick }) {
                     cost: "$9"
                 },
                 {
-                    name: "Lavender",
+                    name: "Lavender Insect", // Differentiated name for example
                     image: "https://images.unsplash.com/photo-1611909023032-2d6b3134ecba?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                    description: "Calming scent, used in aromatherapy.",
+                    description: "Calming scent, used in aromatherapy. Deters insects.",
                     cost: "$20"
                 },
                 {
@@ -133,7 +144,7 @@ function ProductList({ onHomeClick }) {
             category: "Medicinal Plants",
             plants: [
                 {
-                    name: "Aloe Vera",
+                    name: "Aloe Vera Medicinal", // Differentiated name for example
                     image: "https://cdn.pixabay.com/photo/2018/04/02/07/42/leaf-3283175_1280.jpg",
                     description: "Soothing gel used for skin ailments.",
                     cost: "$14"
@@ -151,7 +162,7 @@ function ProductList({ onHomeClick }) {
                     cost: "$13"
                 },
                 {
-                    name: "Lemon Balm",
+                    name: "Lemon Balm Medicinal", // Differentiated name for example
                     image: "https://cdn.pixabay.com/photo/2019/09/16/07/41/balm-4480134_1280.jpg",
                     description: "Calms nerves and promotes relaxation.",
                     cost: "$14"
@@ -186,7 +197,7 @@ function ProductList({ onHomeClick }) {
                     cost: "$10"
                 },
                 {
-                    name: "Snake Plant",
+                    name: "Snake Plant Low Maint", // Differentiated name
                     image: "https://cdn.pixabay.com/photo/2021/01/22/06/04/snake-plant-5939187_1280.jpg",
                     description: "Needs infrequent watering and is resilient to most pests.",
                     cost: "$15"
@@ -218,7 +229,7 @@ function ProductList({ onHomeClick }) {
         padding: '15px',
         display: 'flex',
         justifyContent: 'space-between',
-        alignIems: 'center',
+        alignItems: 'center',
         fontSize: '20px',
     }
     const styleObjUl = {
@@ -235,30 +246,47 @@ function ProductList({ onHomeClick }) {
 
     const handleHomeClick = (e) => {
         e.preventDefault();
-        onHomeClick();
+        setShowCart(false);
+        // onHomeClick(); // Call prop if needed for other routing
     };
 
     const handleCartClick = (e) => {
         e.preventDefault();
-        setShowCart(true); // Set showCart to true when cart icon is clicked
+        setShowCart(true);
     };
-    const handlePlantsClick = (e) => {
+    const handlePlantsLinkClick = (e) => {
         e.preventDefault();
-        setShowPlants(true); // Set showAboutUs to true when "About Us" link is clicked
-        setShowCart(false); // Hide the cart when navigating to About Us
+        setShowCart(false);
     };
 
     const handleContinueShopping = (e) => {
         e.preventDefault();
         setShowCart(false);
     };
+
+    // 5. Implement handleAddToCart function (as per your step)
+    const handleAddToCart = (product) => {
+        dispatch(addItem(product)); // Dispatch the action to add the product to the cart (Redux action)
+        setAddedToCart((prevState) => ({ // Update the local state to reflect that the product has been added
+          ...prevState, // Spread the previous state to retain existing entries
+          [product.name]: true, // Set the current product's name as a key with value 'true' to mark it as added
+        }));
+        // Optionally, you can add a small timeout to reset the 'Added' state for the button
+        // setTimeout(() => {
+        //   setAddedToCart(prevState => ({
+        //     ...prevState,
+        //     [product.name]: false,
+        //   }));
+        // }, 2000); // Reset after 2 seconds
+      };
+
     return (
         <div>
             <div className="navbar" style={styleObj}>
                 <div className="tag">
                     <div className="luxury">
                         <img src="https://cdn.pixabay.com/photo/2020/08/05/13/12/eco-5465432_1280.png" alt="" />
-                        <a href="/" onClick={(e) => handleHomeClick(e)}>
+                        <a href="/" onClick={(e) => handleHomeClick(e)} style={{textDecoration: 'none'}}>
                             <div>
                                 <h3 style={{ color: 'white' }}>Paradise Nursery</h3>
                                 <i style={{ color: 'white' }}>Where Green Meets Serenity</i>
@@ -268,14 +296,41 @@ function ProductList({ onHomeClick }) {
 
                 </div>
                 <div style={styleObjUl}>
-                    <div> <a href="#" onClick={(e) => handlePlantsClick(e)} style={styleA}>Plants</a></div>
-                    <div> <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}><h1 className='cart'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68"><rect width="156" height="156" fill="none"></rect><circle cx="80" cy="216" r="12"></circle><circle cx="184" cy="216" r="12"></circle><path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" id="mainIconPathAttribute"></path></svg></h1></a></div>
+                    <div> <a href="#" onClick={(e) => handlePlantsLinkClick(e)} style={styleA}>Plants</a></div>
+                    <div> <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}><h1 className='cart'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68"><rect width="156" height="156" fill="none"></rect><circle cx="80" cy="216" r="12"></circle><circle cx="184" cy="216" r="12"></circle><path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" id="mainIconPathAttribute"></path></svg></h1></a></div>
                 </div>
             </div>
+
             {!showCart ? (
-                <div className="product-grid">
-
-
+                <div className="product-grid-container">
+                    {plantsArray.map((category, index) => (
+                        <div key={index} className="category-section">
+                            <h1>
+                                <div className="category-title">{category.category}</div>
+                            </h1>
+                            <div className="product-list">
+                                {category.plants.map((plant, plantIndex) => (
+                                    <div className="product-card" key={plant.name + plantIndex}> {/* Improved key for plants with same name in diff categories */}
+                                        <img
+                                            className="product-image"
+                                            src={plant.image}
+                                            alt={plant.name}
+                                        />
+                                        <div className="product-title">{plant.name}</div>
+                                        <div className="product-description">{plant.description}</div>
+                                        <div className="product-cost">{plant.cost}</div>
+                                        <button
+                                            className="product-button"
+                                            onClick={() => handleAddToCart(plant)}
+                                            disabled={addedToCart[plant.name]} // Disable button if item is already marked as added
+                                        >
+                                            {addedToCart[plant.name] ? 'Added to Cart' : 'Add to Cart'}
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             ) : (
                 <CartItem onContinueShopping={handleContinueShopping} />
